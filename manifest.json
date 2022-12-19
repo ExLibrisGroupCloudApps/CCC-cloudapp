@@ -1,0 +1,26 @@
+{
+   "id": "ccc-add-on",
+   "title": "CCC Add-on",
+   "subtitle": "CCC Add-on",
+   "author": "Gal Melamed Turgeman",
+   "icon": {
+      "type": "url",
+      "value": "/assets/CCC_Logo.jpg"
+   },
+   "pages": {
+      "settings": "/#/settings"
+   },
+   "contentSecurity": {
+      "connectSrc": [
+         "https://getitnow.copyright.com/request/info",
+         "https://api-ap.exldevnetwork.net/proxy/request",
+         "https://api-ap.exldevnetwork.net/proxy/request/info",
+         "https://getitnow.dem1.copyright.com/request/process",
+         "https://api-ap.exldevnetwork.net/proxy/request/process",
+         "http://*.corp.exlibrisgroup.com:1801",
+         "http://*.corp.exlibrisgroup.com:1802",
+         "https://*.alma.exlibrisgroup.com",
+         "http://localhost:1801"
+      ]
+   }
+}

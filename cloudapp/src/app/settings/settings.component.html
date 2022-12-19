@@ -1,0 +1,42 @@
+<div class="loading-shade" *ngIf="saving">
+    <mat-spinner diameter="50"></mat-spinner>
+</div>
+<form [formGroup]="form" *ngIf="form">
+    <div class="cloudapp-actions">
+        <button mat-flat-button color="secondary" [routerLink]="['/']">
+            <mat-icon>arrow_back</mat-icon>Back
+        </button>
+        <button mat-flat-button color="primary" type="button" (click)="save()" [disabled]="!form.dirty">Save</button>
+    </div>
+    <h1>Settings</h1>
+    <section class="settings-section">
+        <mat-form-field id="institute" appearance="standard">
+            <mat-label>Institute</mat-label>
+            <input matInput id="institute" name="institute" formControlName="institute"/>
+        </mat-form-field>
+    </section>
+    <section class="settings-section">
+        <mat-form-field id="order-source" appearance="standard">
+            <mat-label>Order Source</mat-label>
+            <input matInput id="order-source" name="orderSource" formControlName="orderSource"/>
+        </mat-form-field>
+    </section>
+    <section class="settings-section">
+        <mat-form-field id="ill-email" appearance="standard">
+            <mat-label>ILL Email Address</mat-label>
+            <input matInput id="ill-email" name="illEmail" formControlName="illEmail"/>
+        </mat-form-field>
+    </section>
+    <section class="settings-section">
+        <mat-form-field id="bill-email" appearance="standard">
+            <mat-label>Bill To Email Address</mat-label>
+            <input matInput id="bill-email" name="billEmail" formControlName="billEmail"/>
+        </mat-form-field>
+    </section>
+    <section class="settings-section">
+        <mat-form-field id="partner-code" appearance="standard">
+            <mat-label>Partner Code</mat-label>
+            <input matInput id="partner-code" name="partnerCode" formControlName="partnerCode"/>
+        </mat-form-field>
+    </section>
+</form>
