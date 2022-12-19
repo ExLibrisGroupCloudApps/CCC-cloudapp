@@ -16,7 +16,7 @@
       </div>
   </div>
     <mat-selection-list #requests (selectionChange)="onSelectedChanged($event)">
-      <mat-list-option *ngFor="let entity of pageEntities" [value]="entity" [ngClass]="(!loading && isEnabled(entity.id) && isPriceLoaded(entity.id) && getEntityPrice(entity.id)!='-1') ? 'entity-option' : 'entity-option-disabled'">
+      <mat-list-option checkboxPosition="before" *ngFor="let entity of pageEntities" [value]="entity" [ngClass]="(!loading && isEnabled(entity.id) && isPriceLoaded(entity.id) && getEntityPrice(entity.id)!='-1') ? 'entity-option' : 'entity-option-disabled'">
         <div class="request-info">
           <span class="request-info-title" color="primary">{{entity.description}}</span>
           <span class="request-info-author" *ngIf="getEntityAuthor(entity.id) && getEntityAuthor(entity.id)!=''">{{getEntityAuthor(entity.id)}}</span>
