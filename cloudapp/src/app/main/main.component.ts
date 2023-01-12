@@ -20,6 +20,7 @@ export class MainComponent implements OnInit, OnDestroy {
   loading = false;
   placeOrderEnded = false;
   settings;
+  hasSettings = false;
   selectedEntity: Entity;
   apiResult: any;
   pageEntities: Entity[];
@@ -43,6 +44,9 @@ export class MainComponent implements OnInit, OnDestroy {
     this.pageLoad$ = this.eventsService.onPageLoad(this.onPageLoad);
     this.settingsService.get().subscribe(settings => {
       this.settings = settings as Settings;
+      if(this.settings.institute){
+        this.hasSettings = true;
+      }
     });
   }
 
@@ -200,6 +204,7 @@ export class MainComponent implements OnInit, OnDestroy {
       event.preventDefault();
       event.stopPropagation();
       $event.option.selected = false;
+      return;
     }
   }
 
@@ -248,7 +253,7 @@ export class MainComponent implements OnInit, OnDestroy {
     let url = "/request";
     url += "?title=" + requestObject.title;
     url +=  "&author=" + requestObject.author;
-    url += "&partner=rapido&orderSource=CCC&requestId=" + requestId;
+    url += "&partner=rapido&orderSource="+ this.settings.institute + "&requestId=" + requestId;
     url += this.getUrlPages(requestObject);
     url += "&institute=" + this.settings.institute;
     url += "&illEmail=" + this.settings.illEmail;

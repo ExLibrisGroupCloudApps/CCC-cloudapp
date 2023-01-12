@@ -8,62 +8,76 @@
   </ng-template>
   
   <ng-template #borrowingtasklist>
-    <div class="eca-actions">
-      <mat-checkbox class="select-all-checkbox" (change)="$event.checked ? onSelectAllClicked() : requests.deselectAll()">Select all</mat-checkbox>
-      <div class="request-all-button" *ngIf="requests.selectedOptions.selected.length > 0">
-        <button mat-flat-button class="primary" color="primary" (click)="onBulkPlaceOrderClicked(requests.selectedOptions.selected)" [disabled]="requests.selectedOptions.selected.length === 0 && !loading">Request all {{requests.selectedOptions.selected.length}} items</button>
-        <!-- <button mat-flat-button color="secondary" (click)="requests.deselectAll()" [disabled]="requests.selectedOptions.selected.length === 0">Clear</button> -->
+    <div *ngIf="!hasSettings" class="highlight">To use this app, you must first configure it's settings.</div>
+    <div *ngIf="hasSettings">
+      <div class="eca-actions">
+          <mat-checkbox class="select-all-checkbox" (change)="$event.checked ? onSelectAllClicked() : requests.deselectAll()">Select all</mat-checkbox>
+          <div class="request-all-button" *ngIf="requests.selectedOptions.selected.length > 0">
+            <button mat-flat-button class="primary" color="primary" (click)="onBulkPlaceOrderClicked(requests.selectedOptions.selected)" [disabled]="requests.selectedOptions.selected.length === 0 && !loading">Request all {{requests.selectedOptions.selected.length}} items</button>
+            <!-- <button mat-flat-button color="secondary" (click)="requests.deselectAll()" [disabled]="requests.selectedOptions.selected.length === 0">Clear</button> -->
+          </div>
       </div>
-  </div>
-    <mat-selection-list #requests (selectionChange)="onSelectedChanged($event)">
-      <mat-list-option checkboxPosition="before" *ngFor="let entity of pageEntities" [value]="entity" [ngClass]="(!loading && isEnabled(entity.id) && isPriceLoaded(entity.id) && getEntityPrice(entity.id)!='-1') ? 'entity-option' : 'entity-option-disabled'">
-        <div class="request-info">
-          <span class="request-info-title" color="primary">{{entity.description}}</span>
-          <span class="request-info-author" *ngIf="getEntityAuthor(entity.id) && getEntityAuthor(entity.id)!=''">{{getEntityAuthor(entity.id)}}</span>
-          <div class="request-info-field" *ngIf="getEntityJournalTitle(entity.id) && getEntityJournalTitle(entity.id)!=''">
-            <span class="request-info-field-key">Journal title: </span>
-            <span class="request-info-field-value">{{getEntityJournalTitle(entity.id)}}</span>
+      <mat-selection-list #requests (selectionChange)="onSelectedChanged($event)">
+        <mat-list-option checkboxPosition="before" *ngFor="let entity of pageEntities" [value]="entity" [ngClass]="(!loading && isEnabled(entity.id) && isPriceLoaded(entity.id) && getEntityPrice(entity.id)!='-1') ? 'entity-option' : 'entity-option-disabled'" (click)="handleTerms(entity)">
+          <div class="request-info">
+            <span class="request-info-title" color="primary">{{entity.description}}</span>
+            <span class="request-info-author" *ngIf="getEntityAuthor(entity.id) && getEntityAuthor(entity.id)!=''">{{getEntityAuthor(entity.id)}}</span>
+            <div class="request-info-field" *ngIf="getEntityJournalTitle(entity.id) && getEntityJournalTitle(entity.id)!=''">
+              <span class="request-info-field-key">Journal title: </span>
+              <span class="request-info-field-value">{{getEntityJournalTitle(entity.id)}}</span>
+            </div>
+            <div class="request-info-field" *ngIf="getEntityPublication(entity.id) && getEntityPublication(entity.id)!=''">
+              <span class="request-info-field-key">Publication: </span>
+              <span class="request-info-field-value">{{getEntityPublication(entity.id)}}</span>
+            </div>
+            <div class="request-info-field" *ngIf="getEntityPages(entity.id) && getEntityPages(entity.id)!=''">
+              <span class="request-info-field-key">Pages: </span>
+              <span class="request-info-field-value">{{getEntityPages(entity.id)}}</span>
+            </div>
+            <div class="button-msg-section">
+              <div *ngIf="loading || !isPriceLoaded(entity.id) || getEntityOrderStatus(entity.id) == 'loading'">
+                <mat-spinner diameter="25"></mat-spinner>
+              </div>
+              <div class="request-price-button" *ngIf="!loading && isPriceLoaded(entity.id) && getEntityPrice(entity.id)!='-1' && getEntityOrderStatus(entity.id) == ''">
+                <!-- <div class="terms-of-use">
+                  <mat-checkbox [checked]="isAccept(entity.id)" (change)="handleTerms($event, entity.id)">I accept the</mat-checkbox>
+                  <a href="www.copyright.com/getitnow" target="_blank">terms of use</a>
+                </div> -->
+                <button mat-flat-button class="primary" color="primary" (click)="onPlaceOrderClicked($event, entity.id)">Request PDF ${{getEntityPrice(entity.id)}}</button>
+              </div>
+              <div class="request-warning-msg" *ngIf="!loading && !isEnabled(entity.id)">
+                <mat-icon>error</mat-icon>
+                Only active electronic requests can be sent to CCC                
+              </div>
+              <div class="request-warning-msg" *ngIf="!loading && isEnabled(entity.id) && isPriceLoaded(entity.id) && getRequestAvailability(entity.id)=='N'">
+                <mat-icon>error</mat-icon>
+                Not Available through Get It Now               
+              </div>
+              <div class="request-error-msg" *ngIf="!loading && isEnabled(entity.id) && isPriceLoaded(entity.id) && getRequestAvailability(entity.id) == 'F'">
+                <mat-icon matTooltip="{{ getPriceErrorMsg(entity.id) }}" [matTooltipDisabled]="false">cancel</mat-icon>
+                Failed to calculate price
+              </div>
+              <div class="request-error-msg" *ngIf="getEntityOrderStatus(entity.id) == 'failed'">
+                <mat-icon matTooltip="{{ getOrderErrorMsg(entity.id) }}" [matTooltipDisabled]="false">cancel</mat-icon>
+                Failed to submit request
+              </div>
+              <div class="request-success-msg" *ngIf="getEntityOrderStatus(entity.id) == 'done'">
+                <mat-icon>check_circle</mat-icon>
+                The request was successfully submitted
+              </div>
+            </div>
           </div>
-          <div class="request-info-field" *ngIf="getEntityPublication(entity.id) && getEntityPublication(entity.id)!=''">
-            <span class="request-info-field-key">Publication: </span>
-            <span class="request-info-field-value">{{getEntityPublication(entity.id)}}</span>
-          </div>
-          <div class="request-info-field" *ngIf="getEntityPages(entity.id) && getEntityPages(entity.id)!=''">
-            <span class="request-info-field-key">Pages: </span>
-            <span class="request-info-field-value">{{getEntityPages(entity.id)}}</span>
-          </div>
-          <div class="button-msg-section">
-            <div *ngIf="loading || !isPriceLoaded(entity.id) || getEntityOrderStatus(entity.id) == 'loading'">
-              <mat-spinner diameter="25"></mat-spinner>
-            </div>
-            <div class="request-price-button" *ngIf="!loading && isPriceLoaded(entity.id) && getEntityPrice(entity.id)!='-1' && getEntityOrderStatus(entity.id) == ''">
-              <button mat-flat-button class="primary" color="primary" (click)="onPlaceOrderClicked($event, entity.id)">Request PDF ${{getEntityPrice(entity.id)}}</button>
-            </div>
-            <div class="request-warning-msg" *ngIf="!loading && !isEnabled(entity.id)">
-              <mat-icon>error</mat-icon>
-              Only active electronic requests can be sent to CCC                
-            </div>
-            <div class="request-warning-msg" *ngIf="!loading && isEnabled(entity.id) && isPriceLoaded(entity.id) && getRequestAvailability(entity.id)=='N'">
-              <mat-icon>error</mat-icon>
-              Not in CCC collection               
-            </div>
-            <div class="request-error-msg" *ngIf="!loading && isEnabled(entity.id) && isPriceLoaded(entity.id) && getRequestAvailability(entity.id) == 'F'">
-              <mat-icon matTooltip="{{ getPriceErrorMsg(entity.id) }}" [matTooltipDisabled]="false">cancel</mat-icon>
-              Failed to calculate price
-            </div>
-            <div class="request-error-msg" *ngIf="getEntityOrderStatus(entity.id) == 'failed'">
-              <mat-icon matTooltip="{{ getOrderErrorMsg(entity.id) }}" [matTooltipDisabled]="false">cancel</mat-icon>
-              Failed to submit request
-            </div>
-            <div class="request-success-msg" *ngIf="getEntityOrderStatus(entity.id) == 'done'">
-              <mat-icon>check_circle</mat-icon>
-              The request was successfully submitted
-            </div>
-          </div>
-        </div>
-        <mat-divider></mat-divider>
-      </mat-list-option>
-    </mat-selection-list>
+          <mat-divider></mat-divider>
+        </mat-list-option>
+      </mat-selection-list>
+      <div class="links">
+        <ul>
+          <li>Questions? <a href="mailto:getitnowsupport@copyright.com" target="_blank">send an email</a></li>
+          <li>Sign-up for Get It Now: <a href="mailto:getitnowsupport@copyright.com" target="_blank">send an email</a></li>
+          <li>Get It Now Info: <a href="www.copyright.com/getitnow" target="_blank">www.copyright.com/getitnow</a></li>
+        </ul>
+      </div>
+    </div>
   </ng-template>
 </div>
 <div class="loading-shade" *ngIf="loading">

@@ -84,7 +84,15 @@
 }
 
 .request-price-button{
+  display: flex;
+  flex-direction: column;
   margin-top: 0.5em;
+}
+
+.terms-of-use{
+  display: flex;
+  align-items: baseline;
+  margin-bottom: 0.5em;
 }
 
 .request-error-msg{
