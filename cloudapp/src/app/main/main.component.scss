@@ -44,6 +44,21 @@
   }
 }
 
+.terms-of-use-checkbox{
+  align-self: flex-start;
+  padding-left: 16px;
+
+  ::ng-deep .mat-checkbox-label{
+    font-size: 16px;
+    font-weight: 400;
+    color: #314456;
+  }
+
+  ::ng-deep .mat-checkbox-frame{
+    border-width: 2px!important;
+  }
+}
+
 .request-info{
   display: flex;
   flex-direction: column;

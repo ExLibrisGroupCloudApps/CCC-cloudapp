@@ -8,7 +8,7 @@
   </ng-template>
   
   <ng-template #borrowingtasklist>
-    <div *ngIf="!hasSettings" class="highlight">To use this app, you must first configure it's settings.</div>
+    <div *ngIf="!hasSettings" class="highlight">To use this app, you must first configure it's settings. Institute field is mandatory.</div>
     <div *ngIf="hasSettings">
       <div class="eca-actions">
           <mat-checkbox class="select-all-checkbox" (change)="$event.checked ? onSelectAllClicked() : requests.deselectAll()">Select all</mat-checkbox>
@@ -17,8 +17,9 @@
             <!-- <button mat-flat-button color="secondary" (click)="requests.deselectAll()" [disabled]="requests.selectedOptions.selected.length === 0">Clear</button> -->
           </div>
       </div>
+      <mat-checkbox #termsofuse class="terms-of-use-checkbox">I accept <a href="https://www.copyright.com/landing/gintou/" target="_blank">terms of use</a></mat-checkbox>
       <mat-selection-list #requests (selectionChange)="onSelectedChanged($event)">
-        <mat-list-option checkboxPosition="before" *ngFor="let entity of pageEntities" [value]="entity" [ngClass]="(!loading && isEnabled(entity.id) && isPriceLoaded(entity.id) && getEntityPrice(entity.id)!='-1') ? 'entity-option' : 'entity-option-disabled'" (click)="handleTerms(entity)">
+        <mat-list-option checkboxPosition="before" *ngFor="let entity of pageEntities" [value]="entity" [ngClass]="(!loading && isEnabled(entity.id) && isPriceLoaded(entity.id) && getEntityPrice(entity.id)!='-1') ? 'entity-option' : 'entity-option-disabled'">
           <div class="request-info">
             <span class="request-info-title" color="primary">{{entity.description}}</span>
             <span class="request-info-author" *ngIf="getEntityAuthor(entity.id) && getEntityAuthor(entity.id)!=''">{{getEntityAuthor(entity.id)}}</span>
@@ -57,9 +58,13 @@
                 <mat-icon matTooltip="{{ getPriceErrorMsg(entity.id) }}" [matTooltipDisabled]="false">cancel</mat-icon>
                 Failed to calculate price
               </div>
-              <div class="request-error-msg" *ngIf="getEntityOrderStatus(entity.id) == 'failed'">
+              <div class="request-error-msg" *ngIf="getEntityOrderStatus(entity.id) == 'failed' && termsofuse.checked">
                 <mat-icon matTooltip="{{ getOrderErrorMsg(entity.id) }}" [matTooltipDisabled]="false">cancel</mat-icon>
-                Failed to submit request
+                Failed to submit the request
+              </div>
+              <div class="request-error-msg" *ngIf="getEntityOrderStatus(entity.id) == 'failed' && !termsofuse.checked">
+                <mat-icon matTooltip="{{ getOrderErrorMsg(entity.id) }}" [matTooltipDisabled]="false">cancel</mat-icon>
+                To submit the request, you must accept the terms of use
               </div>
               <div class="request-success-msg" *ngIf="getEntityOrderStatus(entity.id) == 'done'">
                 <mat-icon>check_circle</mat-icon>

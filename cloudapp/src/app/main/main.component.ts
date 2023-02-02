@@ -8,6 +8,7 @@ import { PriceResponse, PlaceOrderResponse } from '../models/response';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { RestProxyService } from '../services/rest-proxy.service';
 import { Settings } from '../models/settings';
+import { MatCheckbox } from '@angular/material/checkbox';
 
 @Component({
   selector: 'app-main',
@@ -16,6 +17,7 @@ import { Settings } from '../models/settings';
 })
 export class MainComponent implements OnInit, OnDestroy {
   @ViewChild('requests') requests: MatSelectionList;
+  @ViewChild('termsofuse') termsofuse: MatCheckbox;
   private pageLoad$: Subscription;
   loading = false;
   placeOrderEnded = false;
@@ -233,6 +235,10 @@ export class MainComponent implements OnInit, OnDestroy {
     let orderObject = new PlaceOrderResponse();
     orderObject.status = "loading";
     this.requestToOrder.set(requestId, orderObject);
+    if(!this.termsofuse.checked){
+      this.setOrderErrorMsg(requestId, "To submit an order, you must accept the terms of use");
+      return;
+    }
     let requestObject = this.requestIdToRequest.get(requestId);
     if(requestObject.title && requestObject.author && (requestObject.issn || requestObject.isbn) && this.settings.institute && this.settings.illEmail && this.settings.billEmail){
       let url = this.getRequestUrl(requestId, requestObject);
@@ -347,8 +353,15 @@ export class MainComponent implements OnInit, OnDestroy {
 
   setOrderErrorMsg(requestId, error){
     let orderObject = this.requestToOrder.get(requestId);
-    orderObject.status = "failed";
-    orderObject.errorMsg = error;
+    if(orderObject){
+      orderObject.status = "failed";
+      orderObject.errorMsg = error;
+    }else{
+      let orderObject = new PlaceOrderResponse();
+      orderObject.status = "failed";
+      orderObject.errorMsg = error;
+      this.requestToOrder.set(requestId, orderObject);
+    }
   }
 
   updatePartner(requestId, orderNumber, partnerCode){
@@ -398,6 +411,12 @@ export class MainComponent implements OnInit, OnDestroy {
   onBulkPlaceOrderClicked(selectedOptions: MatListOption[]){
     this.placeOrderEnded = false;
     let selectedRequests = selectedOptions.map(o => o.value);
+    if(!this.termsofuse.checked){
+      selectedRequests.forEach(entity => {
+        this.setOrderErrorMsg(entity.id, "To submit an order, you must accept the terms of use")
+      })
+      return;
+    }
     forkJoin({ initData: this.eventsService.getInitData(), authToken: this.eventsService.getAuthToken() }).pipe(concatMap((data) => {
       let authHeader = "Bearer " + data.authToken;
       const headers = new HttpHeaders({
