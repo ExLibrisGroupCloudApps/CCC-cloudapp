@@ -31,7 +31,7 @@ export class RestProxyService {
         const headers = new HttpHeaders({
             'accept': 'application/json',
             'authorization': `Bearer ${token}`,
-            'X-Proxy-Host': 'https://getitnow.dem1.copyright.com/',
+            'X-Proxy-Host': 'https://getitnow.copyright.com/',
         });
         
         switch (req.method) {
