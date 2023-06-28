@@ -27,7 +27,7 @@ export class RestProxyService {
     .pipe(
       switchMap(results => {
         const [token] = results;
-        const url =  'https://api-ap.exldevnetwork.net/proxy'+ req.url ;
+        const url =  'https://api.exldevnetwork.net/proxy'+ req.url ;
         const headers = new HttpHeaders({
             'accept': 'application/json',
             'authorization': `Bearer ${token}`,

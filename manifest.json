@@ -13,14 +13,18 @@
    "contentSecurity": {
       "connectSrc": [
          "https://getitnow.copyright.com/request/info",
+         "https://getitnow.copyright.com/request/process",
+         "https://getitnow.dem1.copyright.com/request/process",
          "https://api-ap.exldevnetwork.net/proxy/request",
          "https://api-ap.exldevnetwork.net/proxy/request/info",
-         "https://getitnow.dem1.copyright.com/request/process",
          "https://api-ap.exldevnetwork.net/proxy/request/process",
          "http://*.corp.exlibrisgroup.com:1801",
          "http://*.corp.exlibrisgroup.com:1802",
          "https://*.alma.exlibrisgroup.com",
-         "http://localhost:1801"
+         "http://localhost:1801",
+         "https://api.exldevnetwork.net/proxy/request",
+         "https://api.exldevnetwork.net/proxy/request/info",
+         "https://api.exldevnetwork.net/proxy/request/process"
       ]
    }
 }
