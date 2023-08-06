@@ -8,7 +8,7 @@
       "value": "/assets/CCC_Logo.jpg"
    },
    "pages": {
-      "settings": "/#/settings"
+      "config": "/#/configuration/"
    },
    "contentSecurity": {
       "connectSrc": [

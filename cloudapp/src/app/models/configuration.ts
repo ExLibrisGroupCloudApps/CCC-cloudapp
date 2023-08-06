@@ -1,4 +1,4 @@
-export class Settings {
+export class Configuration {
     institute: string = "";
     orderSource: string = "";
     illEmail: string = "";

@@ -2,12 +2,12 @@ import { Observable, forkJoin, Subscription, of  } from 'rxjs';
 import { concatMap, map, catchError } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CloudAppRestService, CloudAppEventsService, Request, HttpMethod, 
-  Entity, RestErrorResponse, PageInfo, CloudAppSettingsService } from '@exlibris/exl-cloudapp-angular-lib';
+  Entity, RestErrorResponse, PageInfo, CloudAppConfigService } from '@exlibris/exl-cloudapp-angular-lib';
 import { MatSelectionListChange, MatSelectionList, MatListOption } from '@angular/material/list';
 import { PriceResponse, PlaceOrderResponse } from '../models/response';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { RestProxyService } from '../services/rest-proxy.service';
-import { Settings } from '../models/settings';
+import { Configuration } from '../models/configuration';
 import { MatCheckbox } from '@angular/material/checkbox';
 
 @Component({
@@ -21,7 +21,7 @@ export class MainComponent implements OnInit, OnDestroy {
   private pageLoad$: Subscription;
   loading = false;
   placeOrderEnded = false;
-  settings;
+  configuration;
   hasSettings = false;
   selectedEntity: Entity;
   apiResult: any;
@@ -37,16 +37,16 @@ export class MainComponent implements OnInit, OnDestroy {
   constructor(
     private restService: CloudAppRestService,
     private eventsService: CloudAppEventsService,
-    private settingsService: CloudAppSettingsService,
+    private configurationService: CloudAppConfigService,
     private http: HttpClient,
     private rest: RestProxyService,
   ) { }
 
   ngOnInit() {
     this.pageLoad$ = this.eventsService.onPageLoad(this.onPageLoad);
-    this.settingsService.get().subscribe(settings => {
-      this.settings = settings as Settings;
-      if(this.settings.institute){
+    this.configurationService.get().subscribe(configuration => {
+      this.configuration = configuration as Configuration;
+      if(this.configuration.institute){
         this.hasSettings = true;
       }
     });
@@ -240,7 +240,7 @@ export class MainComponent implements OnInit, OnDestroy {
       return;
     }
     let requestObject = this.requestIdToRequest.get(requestId);
-    if(requestObject.title && requestObject.author && (requestObject.issn || requestObject.isbn) && this.settings.institute && this.settings.illEmail && this.settings.billEmail){
+    if(requestObject.title && requestObject.author && (requestObject.issn || requestObject.isbn) && this.configuration.institute && this.configuration.illEmail && this.configuration.billEmail){
       let url = this.getRequestUrl(requestId, requestObject);
       this.rest.call<any>(url, null).subscribe({
         next: response => {
@@ -259,11 +259,11 @@ export class MainComponent implements OnInit, OnDestroy {
     let url = "/request";
     url += "?title=" + requestObject.title;
     url +=  "&author=" + requestObject.author;
-    url += "&partner=rapido&orderSource="+ this.settings.institute + "&requestId=" + requestId;
+    url += "&partner=rapido&orderSource="+ this.configuration.institute + "&requestId=" + requestId;
     url += this.getUrlPages(requestObject);
-    url += "&institute=" + this.settings.institute;
-    url += "&illEmail=" + this.settings.illEmail;
-    url += "&userBilled=" + this.settings.billEmail;
+    url += "&institute=" + this.configuration.institute;
+    url += "&illEmail=" + this.configuration.illEmail;
+    url += "&userBilled=" + this.configuration.billEmail;
     let publication = requestObject.issn ? requestObject.issn : requestObject.isbn;
     url +=  "&publication=" + publication;
     let priceObject = this.requestToPrice.get(requestId);
@@ -317,16 +317,16 @@ export class MainComponent implements OnInit, OnDestroy {
     let elements = html.getElementsByName('item_number');
     if(elements && elements.length > 0){
       let itemNumber = (<HTMLInputElement>elements[0]).value;
-      if(itemNumber && this.settings.partnerCode){
+      if(itemNumber && this.configuration.partnerCode){
         let url = "/request/process";
-        const params = new URLSearchParams({ item_number: itemNumber, custom: this.settings.illEmail });
+        const params = new URLSearchParams({ item_number: itemNumber, custom: this.configuration.illEmail });
         this.rest.call<any>({ url: url, method: HttpMethod.POST }, params).subscribe({
           next: response => {
             // let parser = new DOMParser();
             let html = parser.parseFromString(response, "text/html");
             let orderNumber = html.getElementById('jobTicket_orderNumber');
             if(orderNumber){
-              this.updatePartner(requestId, orderNumber.innerHTML, this.settings.partnerCode);
+              this.updatePartner(requestId, orderNumber.innerHTML, this.configuration.partnerCode);
               let orderObject = this.requestToOrder.get(requestId);
               orderObject = this.requestToOrder.get(requestId);
               orderObject.status = "done";
@@ -433,7 +433,7 @@ export class MainComponent implements OnInit, OnDestroy {
         orderObject.status = "loading";
         this.requestToOrder.set(entity.id, orderObject);
         let requestObject = this.requestIdToRequest.get(entity.id);
-        if(requestObject.title && requestObject.author && (requestObject.issn || requestObject.isbn) && this.settings.institute && this.settings.illEmail && this.settings.billEmail){
+        if(requestObject.title && requestObject.author && (requestObject.issn || requestObject.isbn) && this.configuration.institute && this.configuration.illEmail && this.configuration.billEmail){
           let url = this.getRequestUrl(entity.id, requestObject);
           calls.push(this.http.get("https://api-ap.exldevnetwork.net/proxy"+url, { headers, responseType: 'text' }).pipe(
             map((res) => {
