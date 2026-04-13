@@ -3,6 +3,7 @@
    "title": "Get It Now Add-on",
    "subtitle": "Get It Now Add-on",
    "author": "Gal Melamed Turgeman",
+   "description": "CCC has announced that the Get It Now article delivery service will be discontinued on June 30, 2026.\nThe Rapido Get It Now cloud app will be removed on June 7, 2026.\nPlease update any workflows that rely on this integration.",
    "icon": {
       "type": "url",
       "value": "/assets/CCC_Logo.jpg"
